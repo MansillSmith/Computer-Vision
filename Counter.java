@@ -21,12 +21,25 @@ public class Counter{
     static int numInputs = 1;
 
     public static void main(String[] args){
-        if(arg.length != numInputs){
+        if(args.length != numInputs){
             Counter counter = new Counter(args[0]);
         }
     }
 
     public Counter(String filename){
-        BufferedImage img=ImageIO.read(new File(filename));
+        BufferedImage img = null;
+        try{
+            img=ImageIO.read(new File(filename));
+        }
+        catch (IOException e){
+            img = null;
+        }
+        
+        if(img == null){
+            System.err.println("Invalid file");
+        }
+        else{
+
+        }
     }
 }

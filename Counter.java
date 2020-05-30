@@ -51,4 +51,60 @@ public class Counter{
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
     }
+
+    //Seperates the image into regions
+    private BufferedImage CalculateRegions(BufferedImage img){
+        return img;
+    }
+
+    //Sharpens the image
+    private BufferedImage SharpenImage(BufferedImage img){
+        return img;
+    }
+
+    //Thresholds the image, where anything less than num is black, anything more is white
+    private BufferedImage ThresholdImage(BufferedImage img, int num){
+        return img;
+    }
+
+    //Thresholds the image
+    private BufferedImage MaxImage(BufferedImage img, int num){
+        return img;
+    }
+
+    //Thresholds the image
+    private BufferedImage MinImage(BufferedImage img, int num){
+        return img;
+    }
+
+    //Removes noise using the median filter algorithm
+    private BufferedImage MedianFilterImage(BufferedImage img){
+        return img;
+    }
+
+    //Shrinks the shapes in the image
+    private BufferedImage ShrinkImage(BufferedImage img){
+        return img;
+    }
+
+    //Grows the shapes in the image
+    private BufferedImage GrowImage(BufferedImage img){
+        return img;
+    }
+
+    //Shrinks the shapes in the image
+    private BufferedImage RegionImage(BufferedImage img){
+        return img;
+    }
+
+    //Calculates the edges of an image
+    private BufferedImage KirshEdgeFilter(BufferedImage img){
+        return img;
+    }
+
+    //Blurs the image
+    private BufferedImage BlurImage(BufferedImage img){
+        return img;
+    }
 }
+    

@@ -225,13 +225,97 @@ public class Counter{
     }
 
     //Shrinks the shapes in the image
-    private BufferedImage ShrinkImage(BufferedImage img){
-        return img;
+    private BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
+        ColorModel colorModel = coverImage.getColorModel();
+        boolean isAlphaPremultiplied = coverImage.isAlphaPremultiplied();
+        WritableRaster raster = coverImage.copyData(null);
+        BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+
+        //For each line
+        for(int y = 0; y < img.getHeight(); y++){
+            //For each pixel in the line
+            for(int x = 0; x < img.getWidth(); x++){
+                int value = (new Color(img.getRGB(x, y))).getRed();
+
+                if(value > 0){
+                    if(IsValidPixel(img, x - 1, y)){
+                        imageCopy.setRGB(x - 1, y, 255);
+                    }
+                    if(IsValidPixel(img, x + 1, y)){
+                        imageCopy.setRGB(x + 1, y, 255);
+                    }
+                    if(IsValidPixel(img, x, y - 1)){
+                        imageCopy.setRGB(x, y - 1, 255);
+                    }
+                    if(IsValidPixel(img, x, y + 1)){
+                        imageCopy.setRGB(x, y + 1, 255);
+                    }
+                    if(n8){
+                        if(IsValidPixel(img, x - 1, y - 1)){
+                            imageCopy.setRGB(x - 1, y - 1, 255);
+                        }
+                        if(IsValidPixel(img, x - 1, y + 1)){
+                            imageCopy.setRGB(x - 1, y + 1, 255);
+                        }
+                        if(IsValidPixel(img, x + 1, y - 1)){
+                            imageCopy.setRGB(x + 1, y - 1, 255);
+                        }
+                        if(IsValidPixel(img, x + 1, y + 1)){
+                            imageCopy.setRGB(x + 1, y + 1, 255);
+                        }
+                    }
+                }
+            }
+        }
+
+        return imageCopy;
     }
 
     //Grows the shapes in the image
     private BufferedImage GrowImage(BufferedImage img){
-        return img;
+        ColorModel colorModel = coverImage.getColorModel();
+        boolean isAlphaPremultiplied = coverImage.isAlphaPremultiplied();
+        WritableRaster raster = coverImage.copyData(null);
+        BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+
+        //For each line
+        for(int y = 0; y < img.getHeight(); y++){
+            //For each pixel in the line
+            for(int x = 0; x < img.getWidth(); x++){
+                int value = (new Color(img.getRGB(x, y))).getRed();
+
+                if(value == 0){
+                    if(IsValidPixel(img, x - 1, y)){
+                        imageCopy.setRGB(x - 1, y, 0);
+                    }
+                    if(IsValidPixel(img, x + 1, y)){
+                        imageCopy.setRGB(x + 1, y, 0);
+                    }
+                    if(IsValidPixel(img, x, y - 1)){
+                        imageCopy.setRGB(x, y - 1, 0);
+                    }
+                    if(IsValidPixel(img, x, y + 1)){
+                        imageCopy.setRGB(x, y + 1, 0);
+                    }
+                    if(n8){
+                        if(IsValidPixel(img, x - 1, y - 1)){
+                            imageCopy.setRGB(x - 1, y - 1, 0);
+                        }
+                        if(IsValidPixel(img, x - 1, y + 1)){
+                            imageCopy.setRGB(x - 1, y + 1, 0);
+                        }
+                        if(IsValidPixel(img, x + 1, y - 1)){
+                            imageCopy.setRGB(x + 1, y - 1, 0);
+                        }
+                        if(IsValidPixel(img, x + 1, y + 1)){
+                            imageCopy.setRGB(x + 1, y + 1, 0);
+                        }
+                    }
+                }
+            }
+        }
+
+        return imageCopy;
     }
 
     //Shrinks the shapes in the image

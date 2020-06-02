@@ -39,19 +39,19 @@ public class Counter{
         //Read in the file
         BufferedImage img = null;
         try{
-            img=ImageIO.read(new File(filename));
+            img = ImageIO.read(new File(filename));
         }
         catch (IOException e){
             img = null;
         }
-
+        
         if(img == null){
             System.err.println("Invalid file");
         }
         else{
             BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
             BufferedImage region = RegionImage(thresh);
-            //blur = ImageOperation(img, FilterOperations.MEDIAN);
+            blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
@@ -75,6 +75,7 @@ public class Counter{
             frame.setVisible(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
+        
     }
 
     private BufferedImage ImageOperation(BufferedImage img, Operations operation){
@@ -229,42 +230,50 @@ public class Counter{
 
     //Shrinks the shapes in the image
     public BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
-        ColorModel colorModel = img.getColorModel();
-        boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
-        WritableRaster raster = img.copyData(null);
-        BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
-
+        //Creates a copy of the image
+        BufferedImage imageCopy = CopyImage(img);
+        
         //For each line
         for(int y = 0; y < img.getHeight(); y++){
             //For each pixel in the line
             for(int x = 0; x < img.getWidth(); x++){
+                //Gets the pixel value at the current x,y coordinates
                 int value = (new Color(img.getRGB(x, y))).getRed();
 
                 if(value > 0){
+                    //Changes the pixel to the left
                     if(IsValidPixel(img, x - 1, y)){
-                        imageCopy.setRGB(x - 1, y, 255);
+                        imageCopy.setRGB(x - 1, y, Color.WHITE.getRGB());
                     }
+                    //Changes the pixel to the right
                     if(IsValidPixel(img, x + 1, y)){
-                        imageCopy.setRGB(x + 1, y, 255);
+                        imageCopy.setRGB(x + 1, y, Color.WHITE.getRGB());
                     }
+                    //Changes the pixel below
                     if(IsValidPixel(img, x, y - 1)){
-                        imageCopy.setRGB(x, y - 1, 255);
+                        imageCopy.setRGB(x, y - 1, Color.WHITE.getRGB());
                     }
+                    //Changes the pixel above
                     if(IsValidPixel(img, x, y + 1)){
-                        imageCopy.setRGB(x, y + 1, 255);
+                        imageCopy.setRGB(x, y + 1, Color.WHITE.getRGB());
                     }
+                    //If you want to use n8 rather than n4
                     if(n8){
+                        //Changes the bottom left pixel
                         if(IsValidPixel(img, x - 1, y - 1)){
-                            imageCopy.setRGB(x - 1, y - 1, 255);
+                            imageCopy.setRGB(x - 1, y - 1, Color.WHITE.getRGB());
                         }
+                        //Changes the top left pixel
                         if(IsValidPixel(img, x - 1, y + 1)){
-                            imageCopy.setRGB(x - 1, y + 1, 255);
+                            imageCopy.setRGB(x - 1, y + 1, Color.WHITE.getRGB());
                         }
+                        //Changes the bottom right pixel
                         if(IsValidPixel(img, x + 1, y - 1)){
-                            imageCopy.setRGB(x + 1, y - 1, 255);
+                            imageCopy.setRGB(x + 1, y - 1, Color.WHITE.getRGB());
                         }
+                        //Changes the top right pixel
                         if(IsValidPixel(img, x + 1, y + 1)){
-                            imageCopy.setRGB(x + 1, y + 1, 255);
+                            imageCopy.setRGB(x + 1, y + 1, Color.WHITE.getRGB());
                         }
                     }
                 }
@@ -276,42 +285,48 @@ public class Counter{
 
     //Grows the shapes in the image
     public BufferedImage GrowImage(BufferedImage img, boolean n8){
-        ColorModel colorModel = img.getColorModel();
-        boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
-        WritableRaster raster = img.copyData(null);
-        BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
+        BufferedImage imageCopy = CopyImage(img);
 
         //For each line
         for(int y = 0; y < img.getHeight(); y++){
             //For each pixel in the line
             for(int x = 0; x < img.getWidth(); x++){
+                //Gets the pixel value at the current x,y coordinates
                 int value = (new Color(img.getRGB(x, y))).getRed();
 
                 if(value == 0){
+                    //Changes the pixel to the left
                     if(IsValidPixel(img, x - 1, y)){
-                        imageCopy.setRGB(x - 1, y, 0);
+                        imageCopy.setRGB(x - 1, y, Color.BLACK.getRGB());
                     }
+                    //Changes the pixel to the right
                     if(IsValidPixel(img, x + 1, y)){
-                        imageCopy.setRGB(x + 1, y, 0);
+                        imageCopy.setRGB(x + 1, y, Color.BLACK.getRGB());
                     }
+                    //Changes the pixel below
                     if(IsValidPixel(img, x, y - 1)){
-                        imageCopy.setRGB(x, y - 1, 0);
+                        imageCopy.setRGB(x, y - 1, Color.BLACK.getRGB());
                     }
+                    //Changes the pixel above
                     if(IsValidPixel(img, x, y + 1)){
-                        imageCopy.setRGB(x, y + 1, 0);
+                        imageCopy.setRGB(x, y + 1, Color.BLACK.getRGB());
                     }
                     if(n8){
+                        //Changes the bottom left pixel
                         if(IsValidPixel(img, x - 1, y - 1)){
-                            imageCopy.setRGB(x - 1, y - 1, 0);
+                            imageCopy.setRGB(x - 1, y - 1, Color.BLACK.getRGB());
                         }
+                        //Changes the top left pixel
                         if(IsValidPixel(img, x - 1, y + 1)){
-                            imageCopy.setRGB(x - 1, y + 1, 0);
+                            imageCopy.setRGB(x - 1, y + 1, Color.BLACK.getRGB());
                         }
+                        //Changes the bottom right pixel
                         if(IsValidPixel(img, x + 1, y - 1)){
-                            imageCopy.setRGB(x + 1, y - 1, 0);
+                            imageCopy.setRGB(x + 1, y - 1, Color.BLACK.getRGB());
                         }
+                        //Changes the top right pixel
                         if(IsValidPixel(img, x + 1, y + 1)){
-                            imageCopy.setRGB(x + 1, y + 1, 0);
+                            imageCopy.setRGB(x + 1, y + 1, Color.BLACK.getRGB());
                         }
                     }
                 }

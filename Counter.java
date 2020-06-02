@@ -10,15 +10,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.rmi.server.RMIClassLoader;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 public class Counter{
 
@@ -26,6 +23,8 @@ public class Counter{
     static int numInputs = 1;
 
     static enum Operations {BLUR, SHARPEN};
+
+    static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
 
     public static void main(String[] args){
         if(args.length == numInputs){
@@ -91,8 +90,7 @@ public class Counter{
 
                 switch(operation){
                     case BLUR:
-                        int[][] filter = {{3,5,3},{5,8,5},{3,5,3}};
-                        newValue = BlurImage(img, filter, x, y);
+                        newValue = BlurImage(img, blurFilter, x, y);
                         break;
                     case SHARPEN:
                         break;

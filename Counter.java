@@ -228,7 +228,7 @@ public class Counter{
     }
 
     //Shrinks the shapes in the image
-    private BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
+    public BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
         ColorModel colorModel = img.getColorModel();
         boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
         WritableRaster raster = img.copyData(null);
@@ -275,10 +275,10 @@ public class Counter{
     }
 
     //Grows the shapes in the image
-    private BufferedImage GrowImage(BufferedImage img){
-        ColorModel colorModel = coverImage.getColorModel();
-        boolean isAlphaPremultiplied = coverImage.isAlphaPremultiplied();
-        WritableRaster raster = coverImage.copyData(null);
+    public BufferedImage GrowImage(BufferedImage img, boolean n8){
+        ColorModel colorModel = img.getColorModel();
+        boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
+        WritableRaster raster = img.copyData(null);
         BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
 
         //For each line

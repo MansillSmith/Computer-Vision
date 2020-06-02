@@ -8,6 +8,7 @@ ID: 1350168
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -228,9 +229,9 @@ public class Counter{
 
     //Shrinks the shapes in the image
     private BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
-        ColorModel colorModel = coverImage.getColorModel();
-        boolean isAlphaPremultiplied = coverImage.isAlphaPremultiplied();
-        WritableRaster raster = coverImage.copyData(null);
+        ColorModel colorModel = img.getColorModel();
+        boolean isAlphaPremultiplied = img.isAlphaPremultiplied();
+        WritableRaster raster = img.copyData(null);
         BufferedImage imageCopy = new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
 
         //For each line

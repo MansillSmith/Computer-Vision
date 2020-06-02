@@ -25,6 +25,7 @@ public class Counter{
     static enum Operations {BLUR, SHARPEN};
 
     static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
+    static int[][] sharpenFilter ={{0,1,0},{1,-4,1},{0,1,0}};
 
     public static void main(String[] args){
         if(args.length == numInputs){
@@ -46,13 +47,8 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            BufferedImage blur = ImageOperation(img, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
-            blur = ImageOperation(blur, Operations.BLUR);
+            BufferedImage blur = ImageOperation(img, Operations.SHARPEN);
+            blur = ImageOperation(blur, Operations.SHARPEN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
@@ -93,6 +89,7 @@ public class Counter{
                         newValue = BlurImage(img, blurFilter, x, y);
                         break;
                     case SHARPEN:
+                        newValue = SharpenImage(img, sharpenFilter, x, y);
                         break;
 
                 }
@@ -110,8 +107,37 @@ public class Counter{
     }
 
     //Sharpens the image
-    private BufferedImage SharpenImage(BufferedImage img){
-        return img;
+    private int SharpenImage(BufferedImage img, int[][] filter, int x, int y){
+        int newval = 0;
+        for(int i = 0; i < filter.length; i++){
+            for(int j = 0; j < filter[i].length; j++){
+                int xvalue = x + i -1;
+                int yvalue = y + i -1;
+
+                int temp = 0;
+                if(IsValidPixel(img, xvalue, yvalue)){
+                    Color color = new Color(img.getRGB(xvalue, yvalue));
+                    temp = color.getRed();
+                }
+                else{
+                    temp = 255;
+                }
+
+                newval += temp * filter[i][j];
+            }
+        }
+        //Calculates the new value of the pixel
+        newval = new Color(img.getRGB(x, y)).getRed() - newval;
+        
+        if(newval > 255){
+            return 255;
+        }
+        else if(newval < 0){
+            return 0;
+        }
+        else{
+            return newval;
+        }
     }
 
     //Thresholds the image, where anything less than num is black, anything more is white
@@ -168,7 +194,7 @@ public class Counter{
 
                 int pixelValue = 0;
                 //If the new point is valid
-                if(xpixelcoord >= 0 && xpixelcoord < img.getWidth() && ypixelcoord >= 0 && ypixelcoord <img.getHeight()){
+                if(IsValidPixel(img, xpixelcoord, ypixelcoord)){
                     Color color = new Color(img.getRGB(xpixelcoord, ypixelcoord));
                     //The image is greyscale
                     pixelValue = color.getRed();
@@ -183,6 +209,10 @@ public class Counter{
         }
 
         return newValue/total;
+    }
+
+    private Boolean IsValidPixel(BufferedImage img, int x, int y){
+        return x >= 0 && x < img.getWidth() && y >= 0 && y <img.getHeight();
     }
 }
     

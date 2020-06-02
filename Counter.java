@@ -100,7 +100,7 @@ public class Counter{
                         newValue = MedianFilterImage(img, 3, x, y);
                         break;
                     case THRESHOLD:
-                        newValue = ThresholdImage(img, 40, x, y);
+                        newValue = ThresholdImage(img, 140, x, y);
                         break;
                     case MAX:
                         newValue = MaxImage(img, 40 , x, y);
@@ -229,7 +229,7 @@ public class Counter{
     }
 
     //Shrinks the shapes in the image
-    public BufferedImage ShrinkImage(BufferedImage img, Boolean n8){
+    public BufferedImage GrowImage(BufferedImage img, Boolean n8){
         //Creates a copy of the image
         BufferedImage imageCopy = CopyImage(img);
         
@@ -284,7 +284,7 @@ public class Counter{
     }
 
     //Grows the shapes in the image
-    public BufferedImage GrowImage(BufferedImage img, boolean n8){
+    public BufferedImage ShrinkImage(BufferedImage img, boolean n8){
         BufferedImage imageCopy = CopyImage(img);
 
         //For each line

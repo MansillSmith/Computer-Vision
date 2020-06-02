@@ -6,10 +6,12 @@ Alex Grant
 ID: 1350168
 */
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.server.RMIClassLoader;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -64,6 +66,52 @@ public class Counter{
         }
     }
 
+    //Applys a filter to the given image
+    private BufferedImage ApplyFilterToImage(BufferedImage img, int[][] filter){
+        //Creates a new image
+        BufferedImage newimg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        //for each line
+        for(int y = 0; y < newimg.getHeight(); y++){
+            //for each pixel
+            for(int x = 0; x < newimg.getWidth(); x++){
+                //Calculate the new value of the pixel
+                int newValue = 0;
+                int total = 0;
+                //Uses the filter to get the ratio of the neighboring pixels
+                for(int i = 0; i < filter.length; i++){
+                    for(int j = 0; j < filter[i].length; j++){
+                        int xpixelcoord = x + i -1;
+                        int ypixelcoord = y + j -1;
+                        
+
+                        int pixelValue = 0;
+                        //If the new point is valid
+                        if(xpixelcoord >= 0 && xpixelcoord < img.getWidth() && ypixelcoord >= 0 && ypixelcoord <img.getHeight()){
+                            Color color = new Color(img.getRGB(xpixelcoord, ypixelcoord));
+                            //The image is greyscale
+                            pixelValue = color.getRed();
+                        }
+                        else{
+                            pixelValue = 255;
+                        }
+
+                        newValue += pixelValue * filter[i][j];
+                        total += filter[i][j];
+                    }
+                }
+
+                //Sets the new color of the pixel
+                int colorValue = newValue/total;
+
+                Color color = new Color(colorValue, colorValue, colorValue);
+                newimg.setRGB(x, y, color.getRGB());
+
+            }
+        }
+        return newimg;
+    }
+
     //Seperates the image into regions
     private BufferedImage CalculateRegions(BufferedImage img){
         return img;
@@ -116,7 +164,8 @@ public class Counter{
 
     //Blurs the image
     private BufferedImage BlurImage(BufferedImage img){
-        return img;
+        int[][] filter = {{3,5,3},{5,8,5}, {3,5,3}};
+        return ApplyFilterToImage(img, filter);
     }
 }
     

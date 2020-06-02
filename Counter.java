@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.rmi.server.RMIClassLoader;
 
 import javax.imageio.ImageIO;
@@ -17,10 +18,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+
 public class Counter{
 
     //The only input is the image
     static int numInputs = 1;
+
+    static enum Operations {BLUR, SHARPEN};
 
     public static void main(String[] args){
         if(args.length == numInputs){
@@ -42,11 +47,18 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
+            BufferedImage blur = ImageOperation(img, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
+            blur = ImageOperation(blur, Operations.BLUR);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
             frame.getContentPane().setLayout(new FlowLayout());
-            frame.getContentPane().add(new JLabel(new ImageIcon(img)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(blur)));
             frame.setSize(img.getWidth(),img.getHeight());
 
             //Do some point operations on the image
@@ -66,8 +78,7 @@ public class Counter{
         }
     }
 
-    //Applys a filter to the given image
-    private BufferedImage ApplyFilterToImage(BufferedImage img, int[][] filter){
+    private BufferedImage ImageOperation(BufferedImage img, Operations operation){
         //Creates a new image
         BufferedImage newimg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -77,36 +88,19 @@ public class Counter{
             for(int x = 0; x < newimg.getWidth(); x++){
                 //Calculate the new value of the pixel
                 int newValue = 0;
-                int total = 0;
-                //Uses the filter to get the ratio of the neighboring pixels
-                for(int i = 0; i < filter.length; i++){
-                    for(int j = 0; j < filter[i].length; j++){
-                        int xpixelcoord = x + i -1;
-                        int ypixelcoord = y + j -1;
-                        
 
-                        int pixelValue = 0;
-                        //If the new point is valid
-                        if(xpixelcoord >= 0 && xpixelcoord < img.getWidth() && ypixelcoord >= 0 && ypixelcoord <img.getHeight()){
-                            Color color = new Color(img.getRGB(xpixelcoord, ypixelcoord));
-                            //The image is greyscale
-                            pixelValue = color.getRed();
-                        }
-                        else{
-                            pixelValue = 255;
-                        }
+                switch(operation){
+                    case BLUR:
+                        int[][] filter = {{3,5,3},{5,8,5},{3,5,3}};
+                        newValue = BlurImage(img, filter, x, y);
+                        break;
+                    case SHARPEN:
+                        break;
 
-                        newValue += pixelValue * filter[i][j];
-                        total += filter[i][j];
-                    }
                 }
 
-                //Sets the new color of the pixel
-                int colorValue = newValue/total;
-
-                Color color = new Color(colorValue, colorValue, colorValue);
+                Color color = new Color(newValue, newValue, newValue);
                 newimg.setRGB(x, y, color.getRGB());
-
             }
         }
         return newimg;
@@ -163,9 +157,34 @@ public class Counter{
     }
 
     //Blurs the image
-    private BufferedImage BlurImage(BufferedImage img){
-        int[][] filter = {{3,5,3},{5,8,5}, {3,5,3}};
-        return ApplyFilterToImage(img, filter);
+    private int BlurImage(BufferedImage img, int[][] filter, int x, int y){
+        //Calculate the new value of the pixel
+        int newValue = 0;
+        int total = 0;
+        //Uses the filter to get the ratio of the neighboring pixels
+        for(int i = 0; i < filter.length; i++){
+            for(int j = 0; j < filter[i].length; j++){
+                int xpixelcoord = x + i -1;
+                int ypixelcoord = y + j -1;
+                
+
+                int pixelValue = 0;
+                //If the new point is valid
+                if(xpixelcoord >= 0 && xpixelcoord < img.getWidth() && ypixelcoord >= 0 && ypixelcoord <img.getHeight()){
+                    Color color = new Color(img.getRGB(xpixelcoord, ypixelcoord));
+                    //The image is greyscale
+                    pixelValue = color.getRed();
+                }
+                else{
+                    pixelValue = 255;
+                }
+
+                newValue += pixelValue * filter[i][j];
+                total += filter[i][j];
+            }
+        }
+
+        return newValue/total;
     }
 }
     

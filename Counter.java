@@ -48,14 +48,16 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            BufferedImage blur = ImageOperation(img, Operations.MIN);
+            BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
+            BufferedImage region = RegionImage(thresh);
             //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
             frame.getContentPane().setLayout(new FlowLayout());
-            frame.getContentPane().add(new JLabel(new ImageIcon(blur)));
-            frame.setSize(img.getWidth(),img.getHeight());
+            frame.getContentPane().add(new JLabel(new ImageIcon(region)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
+            frame.setSize(img.getWidth()*2,img.getHeight()*2);
 
             //Do some point operations on the image
 
@@ -236,7 +238,60 @@ public class Counter{
 
     //Shrinks the shapes in the image
     private BufferedImage RegionImage(BufferedImage img){
-        return img;
+        //Input is binary, black and white image
+        //Creates a new image
+        BufferedImage newimg = CopyImage(img);
+
+        //Background is 255
+        int background = 0;
+        //foreground is 0
+        int foreground = 255;
+
+        int label = 1;
+        for(int x = 0; x < newimg.getWidth(); x++){
+            //For each pixel in the image
+            for(int y = 0; y < newimg.getHeight(); y++){
+                int value = (new Color(newimg.getRGB(x,y))).getRed();
+                if(value == foreground){
+                    Floodfill(newimg, x, y, label, foreground);
+                    label ++;
+                }
+            }
+        }
+        System.out.println(label - 1);
+        return newimg;
+    }
+
+    //Copies the image for regioning
+    private BufferedImage CopyImage(BufferedImage img){
+        //Creates a new image
+        BufferedImage newimg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        for(int i = 0; i < img.getWidth(); i++){
+            for(int j = 0; j < img.getHeight(); j++){
+                newimg.setRGB(i, j, img.getRGB(i,j));
+            }
+        }
+
+        return newimg;
+    }
+
+    //Floodfills a region
+    private void Floodfill(BufferedImage img, int x, int y, int label, int foreground){
+        if(IsValidPixel(img, x, y)){
+            int value = (new Color(img.getRGB(x,y))).getRed();
+            if(value == foreground){
+                //Sets the value of the pixel
+                Color color = new Color(label, label, label);
+                img.setRGB(x, y, color.getRGB());
+
+                //Recursively floodfills the rest of the region
+                Floodfill(img, x+1, y, label, foreground);
+                Floodfill(img, x-1, y, label, foreground);
+                Floodfill(img, x, y+1, label, foreground);
+                Floodfill(img, x, y-1, label, foreground);
+            }
+        } 
     }
 
     //Calculates the edges of an image

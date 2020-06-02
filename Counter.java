@@ -47,6 +47,18 @@ public class Counter{
             frame.getContentPane().add(new JLabel(new ImageIcon(img)));
             frame.setSize(img.getWidth(),img.getHeight());
 
+            //Do some point operations on the image
+
+            //Do edge detection somewhere
+
+            //Threshold the image
+
+            //Shrink / grow the shapes to make them solid and remove noise
+
+            //Do region detection
+
+            //Output the number of regions detected
+
             frame.setVisible(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }

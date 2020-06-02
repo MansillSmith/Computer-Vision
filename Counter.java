@@ -23,7 +23,7 @@ public class Counter{
     //The only input is the image
     static int numInputs = 1;
 
-    static enum Operations {BLUR, SHARPEN, MEDIAN};
+    static enum Operations {BLUR, SHARPEN, MEDIAN, THRESHOLD, MAX, MIN};
 
     static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
     static int[][] sharpenFilter ={{0,1,0},{1,-4,1},{0,1,0}};
@@ -48,8 +48,8 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            BufferedImage blur = ImageOperation(img, Operations.MEDIAN);
-            blur = ImageOperation(img, Operations.MEDIAN);
+            BufferedImage blur = ImageOperation(img, Operations.MIN);
+            //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
@@ -95,7 +95,15 @@ public class Counter{
                     case MEDIAN:
                         newValue = MedianFilterImage(img, 3, x, y);
                         break;
-
+                    case THRESHOLD:
+                        newValue = ThresholdImage(img, 40, x, y);
+                        break;
+                    case MAX:
+                        newValue = MaxImage(img, 40 , x, y);
+                        break;
+                    case MIN:
+                        newValue = MinImage(img, 40 , x, y);
+                        break;
                 }
 
                 Color color = new Color(newValue, newValue, newValue);
@@ -145,18 +153,39 @@ public class Counter{
     }
 
     //Thresholds the image, where anything less than num is black, anything more is white
-    private BufferedImage ThresholdImage(BufferedImage img, int num){
-        return img;
+    private int ThresholdImage(BufferedImage img, int num, int x, int y){
+        int value = (new Color(img.getRGB(x,y))).getRed();
+        
+        if(value < num){
+            return 0;
+        }
+        else{
+            return 255;
+        }
     }
 
     //Thresholds the image
-    private BufferedImage MaxImage(BufferedImage img, int num){
-        return img;
+    private int MaxImage(BufferedImage img, int num, int x, int y){
+        int value = (new Color(img.getRGB(x,y))).getRed();
+        
+        if(value < num){
+            return value;
+        }
+        else{
+            return 255;
+        }
     }
 
     //Thresholds the image
-    private BufferedImage MinImage(BufferedImage img, int num){
-        return img;
+    private int MinImage(BufferedImage img, int num, int x, int y){
+        int value = (new Color(img.getRGB(x,y))).getRed();
+        
+        if(value < num){
+            return 0;
+        }
+        else{
+            return value;
+        }
     }
 
     //Removes noise using the median filter algorithm

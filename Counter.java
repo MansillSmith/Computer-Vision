@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -22,7 +23,7 @@ public class Counter{
     //The only input is the image
     static int numInputs = 1;
 
-    static enum Operations {BLUR, SHARPEN};
+    static enum Operations {BLUR, SHARPEN, MEDIAN};
 
     static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
     static int[][] sharpenFilter ={{0,1,0},{1,-4,1},{0,1,0}};
@@ -47,8 +48,8 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            BufferedImage blur = ImageOperation(img, Operations.SHARPEN);
-            blur = ImageOperation(blur, Operations.SHARPEN);
+            BufferedImage blur = ImageOperation(img, Operations.MEDIAN);
+            blur = ImageOperation(img, Operations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
@@ -91,6 +92,9 @@ public class Counter{
                     case SHARPEN:
                         newValue = SharpenImage(img, sharpenFilter, x, y);
                         break;
+                    case MEDIAN:
+                        newValue = MedianFilterImage(img, 3, x, y);
+                        break;
 
                 }
 
@@ -112,7 +116,7 @@ public class Counter{
         for(int i = 0; i < filter.length; i++){
             for(int j = 0; j < filter[i].length; j++){
                 int xvalue = x + i -1;
-                int yvalue = y + i -1;
+                int yvalue = y + j -1;
 
                 int temp = 0;
                 if(IsValidPixel(img, xvalue, yvalue)){
@@ -156,8 +160,39 @@ public class Counter{
     }
 
     //Removes noise using the median filter algorithm
-    private BufferedImage MedianFilterImage(BufferedImage img){
-        return img;
+    private int MedianFilterImage(BufferedImage img, int size, int x, int y){
+        ArrayList<Integer> neighborhood = new ArrayList<Integer>();
+        for(int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
+                int xvalue = x + i -1;
+                int yvalue = y + i -1;
+
+                int val = 0;
+                if(IsValidPixel(img, xvalue, yvalue)){
+                    val = new Color(img.getRGB(xvalue, yvalue)).getRed();
+                }
+                else{
+                    val = 255;
+                }
+                neighborhood.add(val);             
+            }
+        }
+        SortArray(neighborhood);
+        return neighborhood.get(4);
+    }
+
+    //Bubble sorts the array
+    private void SortArray(ArrayList<Integer> list){
+        for (int i = 0; i < list.size()-1; i++){       
+            for (int j = 0; j < list.size()-i-1; j++){
+                if (list.get(j) > list.get(j+1)){
+                    //Swap
+                    int temp = list.get(j);
+                    list.set(j, list.get(j+1));
+                    list.set(j+1, temp);
+                }
+            }  
+        }
     }
 
     //Shrinks the shapes in the image

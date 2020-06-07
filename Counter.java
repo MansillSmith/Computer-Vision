@@ -49,15 +49,18 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
-            BufferedImage region = RegionImage(thresh);
-            blur = ImageOperation(img, FilterOperations.MEDIAN);
+            //BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
+            //BufferedImage region = RegionImage(thresh);
+            BufferedImage test = AutoContrast(img);
+            //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
             frame.getContentPane().setLayout(new FlowLayout());
-            frame.getContentPane().add(new JLabel(new ImageIcon(region)));
-            frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
+            //frame.getContentPane().add(new JLabel(new ImageIcon(region)));
+            //frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(img)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(test)));
             frame.setSize(img.getWidth()*2,img.getHeight()*2);
 
             //Do some point operations on the image
@@ -228,7 +231,7 @@ public class Counter{
         }
     }
 
-    //Shrinks the shapes in the image
+    //Grows the shapes in the image
     public BufferedImage GrowImage(BufferedImage img, Boolean n8){
         //Creates a copy of the image
         BufferedImage imageCopy = CopyImage(img);
@@ -283,7 +286,7 @@ public class Counter{
         return imageCopy;
     }
 
-    //Grows the shapes in the image
+    //Shrinks the shapes in the image
     public BufferedImage ShrinkImage(BufferedImage img, boolean n8){
         BufferedImage imageCopy = CopyImage(img);
 
@@ -430,8 +433,108 @@ public class Counter{
         return newValue/total;
     }
 
+    private BufferedImage AutoContrast(BufferedImage img){
+        int totalPixels = 0;
+        //Creates copy of the image
+        BufferedImage imageCopy = CopyImage(img);
+        //Gets array of pixel distribution
+        int[] pixelDistribution = GetPixelDistribution(img);
+
+        //Gets the total number of pixels
+        for(int i = 0; i < 256; i++){
+            totalPixels += pixelDistribution[i];
+        }
+
+        //Gets the low threshold value
+        int low = GetMinValue(pixelDistribution, totalPixels);
+        //Gets the high threshold value
+        int high = GetMaxValue(pixelDistribution, totalPixels);
+        System.out.println("Low: " + low);
+        System.out.println("High: " + high);
+        System.out.println("Total: " + totalPixels);
+        for(int i = 0; i < 256; i++){
+            System.out.print(" | " + i + ": " + pixelDistribution[i]);
+        }
+
+        //For each line
+        for(int y = 0; y < img.getHeight(); y++){
+            //For each pixel
+            for(int x = 0; x < img.getWidth(); x++){
+                //Get the pixel value at the x and y coordinates
+                int value = (new Color(img.getRGB(x,y))).getRed();
+                int newValue;
+
+                //Apply autocontrasting
+                if(value <= low){
+                    newValue = 0;
+                }else if(value >= high){
+                    newValue = 255;
+                }else{
+                    newValue = ((value - low)*(255/(high-low)));
+                }
+
+                //Generate RGB value for the image
+                int rgb = new Color(newValue, newValue, newValue).getRGB();
+                //Sets the value in the image copy to be equal to the new value
+                imageCopy.setRGB(x, y, rgb);
+            }
+        }
+        return imageCopy;
+    }
+
     private Boolean IsValidPixel(BufferedImage img, int x, int y){
         return x >= 0 && x < img.getWidth() && y >= 0 && y <img.getHeight();
+    }
+
+    private int GetMinValue(int[] array, int totalPixels){
+        int pixelValue = 0;
+        int tempCounter = 0;
+        
+        //Gets the threshold value from the total number of pixels
+        int lowThreshold = (int)(totalPixels * 0.01);
+
+        //Finds the pixel value of the pixel at the threshold level
+        for(int i = 0; i <= 255; i++){
+            tempCounter += array[i];
+            if(tempCounter >= lowThreshold){
+                pixelValue = i;
+                break;
+            }
+        }
+        return pixelValue;
+    }
+
+    private int GetMaxValue(int[] array, int totalPixels){
+        int pixelValue = 0;
+        int tempCounter = 0;
+
+        //Gets the threshold value from the total number of pixels
+        int highThreshold = (int)(totalPixels * 0.99);
+
+        //Finds the pixel value of the pixel at the threshold level
+        for(int i = 0; i <= 255; i++){
+            tempCounter += array[i];
+            if(tempCounter >= highThreshold){
+                pixelValue = i;
+                break;
+            }
+        }
+        return pixelValue;
+    }
+
+    private int[] GetPixelDistribution(BufferedImage img){
+        int[] array = new int[256];
+
+        for(int y = 0; y < img.getHeight(); y++){
+            //For each pixel
+            for(int x = 0; x < img.getWidth(); x++){
+                //Get the RGB value of the pixel
+                int value = (new Color(img.getRGB(x,y))).getRed();
+                //If the value of the pixel is more than the current maximum value
+                array[value]++;
+            }
+        }
+        return array;
     }
 }
     

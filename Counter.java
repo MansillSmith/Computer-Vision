@@ -51,7 +51,7 @@ public class Counter{
         else{
             //BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
             //BufferedImage region = RegionImage(thresh);
-            BufferedImage test = AutoContrast(img);
+            BufferedImage autoContrast = AutoContrast(img);
             //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
@@ -60,7 +60,7 @@ public class Counter{
             //frame.getContentPane().add(new JLabel(new ImageIcon(region)));
             //frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
             frame.getContentPane().add(new JLabel(new ImageIcon(img)));
-            frame.getContentPane().add(new JLabel(new ImageIcon(test)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(autoContrast)));
             frame.setSize(img.getWidth()*2,img.getHeight()*2);
 
             //Do some point operations on the image
@@ -449,12 +449,6 @@ public class Counter{
         int low = GetMinValue(pixelDistribution, totalPixels);
         //Gets the high threshold value
         int high = GetMaxValue(pixelDistribution, totalPixels);
-        System.out.println("Low: " + low);
-        System.out.println("High: " + high);
-        System.out.println("Total: " + totalPixels);
-        for(int i = 0; i < 256; i++){
-            System.out.print(" | " + i + ": " + pixelDistribution[i]);
-        }
 
         //For each line
         for(int y = 0; y < img.getHeight(); y++){
@@ -470,7 +464,7 @@ public class Counter{
                 }else if(value >= high){
                     newValue = 255;
                 }else{
-                    newValue = ((value - low)*(255/(high-low)));
+                    newValue = (int)((value - low)*(((double)255)/((double)(high - low))));
                 }
 
                 //Generate RGB value for the image
@@ -491,7 +485,7 @@ public class Counter{
         int tempCounter = 0;
         
         //Gets the threshold value from the total number of pixels
-        int lowThreshold = (int)(totalPixels * 0.01);
+        int lowThreshold = (int)(totalPixels * 0.05);
 
         //Finds the pixel value of the pixel at the threshold level
         for(int i = 0; i <= 255; i++){
@@ -509,7 +503,7 @@ public class Counter{
         int tempCounter = 0;
 
         //Gets the threshold value from the total number of pixels
-        int highThreshold = (int)(totalPixels * 0.99);
+        int highThreshold = (int)(totalPixels * 0.95);
 
         //Finds the pixel value of the pixel at the threshold level
         for(int i = 0; i <= 255; i++){

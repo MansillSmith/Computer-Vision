@@ -8,7 +8,6 @@ ID: 1350168
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,11 +16,9 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 
 public class Counter{
-
     //The only input is the image
     static int numInputs = 1;
 
@@ -29,9 +26,6 @@ public class Counter{
 
     static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
     static int[][] sharpenFilter ={{0,1,0},{1,-4,1},{0,1,0}};
-
-    static int DEFAULT_THRESH = 140;
-    static int MAX_MIN_VALUE = 40;
 
     public static void main(String[] args){
         if(args.length == numInputs){
@@ -122,6 +116,7 @@ public class Counter{
         
     }
 
+    //Performs an image operation to the image
     private BufferedImage ImageOperation(BufferedImage img, Operations operation, int value){
         //Creates a new image
         BufferedImage newimg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -133,6 +128,7 @@ public class Counter{
                 //Calculate the new value of the pixel
                 int newValue = 0;
 
+                //Calculates the new pixel value
                 switch(operation){
                     case BLUR:
                         newValue = BlurImage(img, blurFilter, x, y);
@@ -154,16 +150,12 @@ public class Counter{
                         break;
                 }
 
+                //Sets the new pixel value
                 Color color = new Color(newValue, newValue, newValue);
                 newimg.setRGB(x, y, color.getRGB());
             }
         }
         return newimg;
-    }
-
-    //Seperates the image into regions
-    private BufferedImage CalculateRegions(BufferedImage img){
-        return img;
     }
 
     //Sharpens the image
@@ -437,11 +429,6 @@ public class Counter{
         } 
     }
 
-    //Calculates the edges of an image
-    private BufferedImage KirshEdgeFilter(BufferedImage img){
-        return img;
-    }
-
     //Blurs the image
     private int BlurImage(BufferedImage img, int[][] filter, int x, int y){
         //Calculate the new value of the pixel
@@ -452,7 +439,6 @@ public class Counter{
             for(int j = 0; j < filter[i].length; j++){
                 int xpixelcoord = x + i -1;
                 int ypixelcoord = y + j -1;
-                
 
                 int pixelValue = 0;
                 //If the new point is valid
@@ -516,10 +502,12 @@ public class Counter{
         return imageCopy;
     }
 
+    //Calculates if the pixel is a valid pixel
     private Boolean IsValidPixel(BufferedImage img, int x, int y){
         return x >= 0 && x < img.getWidth() && y >= 0 && y <img.getHeight();
     }
 
+    //Gets the min value of the pixel for auto contrast
     private int GetMinValue(int[] array, int totalPixels){
         int pixelValue = 0;
         int tempCounter = 0;
@@ -538,6 +526,7 @@ public class Counter{
         return pixelValue;
     }
 
+    //Gets the max value for auto constrast
     private int GetMaxValue(int[] array, int totalPixels){
         int pixelValue = 0;
         int tempCounter = 0;
@@ -556,6 +545,7 @@ public class Counter{
         return pixelValue;
     }
 
+    //Gets the pixel distrubution of the image
     private int[] GetPixelDistribution(BufferedImage img){
         int[] array = new int[256];
 

@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 public class Counter{
@@ -52,20 +53,16 @@ public class Counter{
             System.err.println("Invalid file");
         }
         else{
-            //BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
-            //BufferedImage region = RegionImage(thresh);
-            //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
             frame.setLayout(new FlowLayout());
             frame.getContentPane().setLayout(new FlowLayout());
-            //frame.getContentPane().add(new JLabel(new ImageIcon(region)));
-            //frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
 
-            //Do some point operations on the image
+            //Auto contrast the image to make all the cells of all the image the same set of colours
             BufferedImage autoContrast = AutoContrast(img);
-            //BufferedImage sharpen = ImageOperation(autoContrast, Operations.SHARPEN, 0);
-            BufferedImage threshold = ImageOperation(autoContrast,Operations.THRESHOLD, 110);
+            //Turn everything darker than 115 to black, and everything lighter to white
+            BufferedImage threshold = ImageOperation(autoContrast,Operations.THRESHOLD, 115);
+            //Shrink and grow the image to remove noise
             BufferedImage shrunk = ShrinkImage(threshold, true);
             shrunk = ShrinkImage(shrunk, true);
             shrunk = ShrinkImage(shrunk, true);
@@ -74,22 +71,51 @@ public class Counter{
             shrunk = GrowImage(shrunk, true);
             shrunk = ShrinkImage(shrunk, true);
             
-            BufferedImage region = RegionImage(shrunk);
+            //Calculate the number of regions on the image
+            int regions = RegionImage(shrunk);
 
-            //Do edge detection somewhere
+            Color textColour = new Color(255,0,0);
 
-            //Threshold the image
+            //Add the images to the form
+            JLabel displayImage = new JLabel(new ImageIcon(img));
+            JLabel text = new JLabel("Original Image");
+            text.setLocation(0, 0);
+            text.setSize(150,15);
+            text.setForeground(textColour);
+            displayImage.add(text);
+            frame.getContentPane().add(displayImage);
 
-            //Shrink / grow the shapes to make them solid and remove noise
+            JLabel displayAutoContrast = new JLabel(new ImageIcon(autoContrast));
+            text = new JLabel("Auto Constrast Image");
+            text.setLocation(0, 0);
+            text.setSize(150,15);
+            text.setForeground(textColour);
+            displayAutoContrast.add(text);
+            frame.getContentPane().add(displayAutoContrast);
 
-            //Do region detection
+            JLabel displayThreshold = new JLabel(new ImageIcon(threshold));
+            text = new JLabel("Threshold Image");
+            text.setLocation(0, 0);
+            text.setSize(150,15);
+            text.setForeground(textColour);
+            displayThreshold.add(text);
+            frame.getContentPane().add(displayThreshold);
 
-            //Output the number of regions detected
+            JLabel displayShrunkAndGrown = new JLabel(new ImageIcon(shrunk));
+            text = new JLabel("Shrunk and grown image");
+            text.setLocation(0, 0);
+            text.setSize(150,15);
+            text.setForeground(textColour);
+            displayShrunkAndGrown.add(text);
+            frame.getContentPane().add(displayShrunkAndGrown);
 
-            frame.getContentPane().add(new JLabel(new ImageIcon(shrunk)));
-            frame.getContentPane().add(new JLabel(new ImageIcon(threshold)));
-            frame.setSize(img.getWidth()*2,img.getHeight()*2);
+            JLabel numberOfRegions = new JLabel("Regions: " + regions);
+            text.setLocation(0, 0);
+            text.setSize(150,15);
+            text.setForeground(textColour);
+            frame.getContentPane().add(numberOfRegions);
 
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             frame.setVisible(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
@@ -355,7 +381,7 @@ public class Counter{
     }
 
     //Shrinks the shapes in the image
-    private BufferedImage RegionImage(BufferedImage img){
+    private int RegionImage(BufferedImage img){
         //Input is binary, black and white image
         //Creates a new image
         BufferedImage newimg = CopyImage(img);
@@ -376,8 +402,7 @@ public class Counter{
                 }
             }
         }
-        System.out.println(label - 1);
-        return newimg;
+        return label -1;
     }
 
     //Copies the image for regioning

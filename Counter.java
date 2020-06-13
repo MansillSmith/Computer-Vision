@@ -29,6 +29,9 @@ public class Counter{
     static int[][] blurFilter = {{3,5,3},{5,8,5},{3,5,3}};
     static int[][] sharpenFilter ={{0,1,0},{1,-4,1},{0,1,0}};
 
+    static int DEFAULT_THRESH = 140;
+    static int MAX_MIN_VALUE = 40;
+
     public static void main(String[] args){
         if(args.length == numInputs){
             Counter counter = new Counter(args[0]);
@@ -51,7 +54,6 @@ public class Counter{
         else{
             //BufferedImage thresh = ImageOperation(img, Operations.THRESHOLD);
             //BufferedImage region = RegionImage(thresh);
-            BufferedImage autoContrast = AutoContrast(img);
             //blur = ImageOperation(img, FilterOperations.MEDIAN);
             //Creates a form with the image
             JFrame frame = new JFrame();
@@ -59,11 +61,20 @@ public class Counter{
             frame.getContentPane().setLayout(new FlowLayout());
             //frame.getContentPane().add(new JLabel(new ImageIcon(region)));
             //frame.getContentPane().add(new JLabel(new ImageIcon(thresh)));
-            frame.getContentPane().add(new JLabel(new ImageIcon(img)));
-            frame.getContentPane().add(new JLabel(new ImageIcon(autoContrast)));
-            frame.setSize(img.getWidth()*2,img.getHeight()*2);
 
             //Do some point operations on the image
+            BufferedImage autoContrast = AutoContrast(img);
+            //BufferedImage sharpen = ImageOperation(autoContrast, Operations.SHARPEN, 0);
+            BufferedImage threshold = ImageOperation(autoContrast,Operations.THRESHOLD, 110);
+            BufferedImage shrunk = ShrinkImage(threshold, true);
+            shrunk = ShrinkImage(shrunk, true);
+            shrunk = ShrinkImage(shrunk, true);
+            shrunk = GrowImage(shrunk, true);
+            shrunk = GrowImage(shrunk, true);
+            shrunk = GrowImage(shrunk, true);
+            shrunk = ShrinkImage(shrunk, true);
+            
+            BufferedImage region = RegionImage(shrunk);
 
             //Do edge detection somewhere
 
@@ -75,13 +86,17 @@ public class Counter{
 
             //Output the number of regions detected
 
+            frame.getContentPane().add(new JLabel(new ImageIcon(shrunk)));
+            frame.getContentPane().add(new JLabel(new ImageIcon(threshold)));
+            frame.setSize(img.getWidth()*2,img.getHeight()*2);
+
             frame.setVisible(true);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
         
     }
 
-    private BufferedImage ImageOperation(BufferedImage img, Operations operation){
+    private BufferedImage ImageOperation(BufferedImage img, Operations operation, int value){
         //Creates a new image
         BufferedImage newimg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -103,13 +118,13 @@ public class Counter{
                         newValue = MedianFilterImage(img, 3, x, y);
                         break;
                     case THRESHOLD:
-                        newValue = ThresholdImage(img, 140, x, y);
+                        newValue = ThresholdImage(img, value, x, y);
                         break;
                     case MAX:
-                        newValue = MaxImage(img, 40 , x, y);
+                        newValue = MaxImage(img, value , x, y);
                         break;
                     case MIN:
-                        newValue = MinImage(img, 40 , x, y);
+                        newValue = MinImage(img, value , x, y);
                         break;
                 }
 
